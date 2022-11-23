@@ -5,3 +5,4 @@ static/js/config.js
 .idea/misc.xml
 .idea/Mapping_Earthquakes.iml
 .idea/inspectionProfiles/profiles_settings.xml
+.DS_Store
