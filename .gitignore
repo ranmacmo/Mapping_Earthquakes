@@ -6,3 +6,4 @@ static/js/config.js
 .idea/Mapping_Earthquakes.iml
 .idea/inspectionProfiles/profiles_settings.xml
 .DS_Store
+config.js
