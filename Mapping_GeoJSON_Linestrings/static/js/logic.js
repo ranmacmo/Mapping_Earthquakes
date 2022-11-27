@@ -1,6 +1,6 @@
 
 // Accessing the airport GeoJSON URL
-let airportData = "https://raw.githubusercontent.com/ranmacmo/Mapping_Earthquakes/Mapping_GeoJSON_Points/Mapping_GeoJSON_Points/majorAirports.json";
+let torontoData = "https://raw.githubusercontent.com/ranmacmo/Mapping_Earthquakes/Mapping_GeoJSON_Linestrings/Mapping_GeoJSON_Linestrings/torontoRoutes.json";
 
 // Adding a dark tile layer
 let dark = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
@@ -24,8 +24,8 @@ let light = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}
 
 // Create a base layer that holds both maps.
 let baseMaps = {
-  Light: light,
-  Dark: dark
+  "Day Navigation" : light,
+  "Night Navigation" : dark
 };
 
 // Create the map object with center, zoom level and default layer.
@@ -35,17 +35,35 @@ let myMap = L.map('map', {
     layers: [light]
 })
 
+
 // Pass our map layers into our layers control and add the layers control to the map.
 L.control.layers(baseMaps).addTo(myMap);
 
 
+// Create a style for the lines.
+let myStyle = {
+    color: "#ffffa1",
+    weight: 2
+}
+
+
+// Grabbing our GeoJSON data.
+// d3.json(torontoData).then(function(data) {
+//     console.log(data);
+//   // Creating a GeoJSON layer with the retrieved data.
+//   L.geoJSON(data).addTo(myMap);
+// });
+
+
+
 // ** Grabbing our GeoJSON data
-// Add popup for each airport
-d3.json(airportData).then(function(data) {
+d3.json(torontoData).then(function(data) {
     console.log(data)
+  // Creating a GeoJSON layer with retrieved data
   L.geoJson(data, {
+    style:myStyle,
     onEachFeature: function(features, layer){
-      layer.bindPopup("<h3>" + features.properties.faa + "</h3>" + "<hr>" + features.properties.name)
+      layer.bindPopup("<h3> Airline: " + features.properties.airline + "</h3>" + features.properties.dst)
     }
   }).addTo(myMap);
 });
