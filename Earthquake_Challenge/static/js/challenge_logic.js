@@ -249,4 +249,3 @@ d3.json(majorEQData).then(function(data) {
 
     majorEarthquakes.addTo(myMap)
 });
-# comment change
