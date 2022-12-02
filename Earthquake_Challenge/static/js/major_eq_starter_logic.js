@@ -42,8 +42,11 @@ let overlays = {
 // layers are visible.
 L.control.layers(baseMaps, overlays).addTo(map);
 
+
+// RETRIEVE DATASETS -----
 // Retrieve the earthquake GeoJSON data.
-d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
+let eqData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
+d3.json(eqData).then(function(data) {
 
   // This function returns the style data for each of the earthquakes we plot on
   // the map. We pass the magnitude of the earthquake into two separate functions
@@ -59,6 +62,9 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       weight: 0.5
     };
   }
+
+let tekData = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_plates.json"
+
 
   // This function determines the color of the marker based on the magnitude of the earthquake.
   function getColor(magnitude) {

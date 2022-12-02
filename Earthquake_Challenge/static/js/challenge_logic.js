@@ -1,6 +1,8 @@
-// Add console.log to check to see if our code is working.
+
 console.log("working");
 
+// ADD TILES - BASE MAPS
+// ---------------------------------------------------
 // Adding a street tile layer
 let streets = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
   attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
@@ -21,7 +23,7 @@ let satelliteStreets = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/
   accessToken: API_KEY
 });
 
-// Adding street satellite tile layer
+// Adding dark tile layer
 let dark = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}", {
   attribution: "© <a href='https://www.mapbox.com/about/maps/'>Mapbox</a> © <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> <strong><a href='https://www.mapbox.com/map-feedback/' target='_blank'>Improve this map</a></strong>",
   tileSize: 512,
@@ -31,14 +33,6 @@ let dark = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?
   accessToken: API_KEY
 });
 
-// Create the map object with center, zoom level and default layer.
-let myMap = L.map('map', {
- 	center: [40.7, -94.5],
-    zoom: 3,
-    layers: [streets]
-})
-
-// CREATE TILES OVERLAY -------
 // Create a base layer that holds both maps.
 let baseMaps = {
   "Streets" : streets,
@@ -47,19 +41,27 @@ let baseMaps = {
 };
 
 
-// ADD EARTHQUAKE LAYER ---------
 
-// 1. Add a 2nd layer group for the tectonic plate data
-// 1. Add a 3rd layer group for the major earthquake data.
+// CREATE MAP OBJECT
+// ---------------------------------------------------
+// Create the map object with center, zoom level and default layer.
+let myMap = L.map('map', {
+ 	center: [40.7, -94.5],
+    zoom: 3,
+    layers: [streets]
+})
+
+// CREATE TILES OVERLAY
+// ---------------------------------------------------
+// Add a  layer group for the tectonic plate data
+// Add a  layer group for the major earthquake data.
 let earthquakes = new L.layerGroup();
 let tectonicPlates = new L.LayerGroup() ;
 let majorEarthquakes = new L.LayerGroup()
 
-
-
 // We define an object that contains the overlays.
-// 2. Add a reference to the tectonic plates group to the overlays object.
-// 2. Add a reference to the major earthquake group to the overlays object.
+// Add a reference to the tectonic plates group to the overlays object.
+// Add a reference to the major earthquake group to the overlays object.
 let overlays = {
   "Tectonic Plates" : tectonicPlates,
   "Earthquakes": earthquakes,
@@ -71,9 +73,10 @@ let overlays = {
 // which layers are visible.
 L.control.layers(baseMaps, overlays).addTo(myMap);
 
-// END EARTHQUAKE LAYER ----------
+
 
 // CREATE LEGEND
+// ---------------------------------------------------
 // Create Constants
 const magnitudes = [0, 1, 2, 3, 4, 5];
 const colors = [
@@ -85,7 +88,7 @@ const colors = [
   "#ea2c2c"
 ];
 
-// 1. Create a legend control object.
+// Create a legend control object.
 let legend = L.control({
   position: "bottomright"
 });
@@ -106,14 +109,8 @@ legend.onAdd = function() {
 
 legend.addTo(myMap);
 
-// END CREATE LEGEND
 
-// Create a style for the lines.
-let myStyle = {
-    color: "#ffffa1",
-    weight: 2
-}
-
+// FUNCTIONS FOR MAP STYLING
 // This function determines the radius of the earthquake marker based on its magnitude.
 // Earthquakes with a magnitude of 0 will be plotted with a radius of 1.
 function getRadius(magnitude) {
@@ -177,18 +174,25 @@ function styleInfoMajor(feature) {
     weight: 0.5
   };
 }
+// Create a style for the lines.
+let PlatelineStyle = {
+        color: "red",
+        weight: 1
+        };
 
-
-// Accessing the earthquake GeoJSON URL
+// GET DATA SECTION
+// ---------------------------------------------------
+// EARTHQUAKE GeoJSON
+// ------------------
 let eqData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson"
-// ** Grabbing our GeoJSON data
+
 d3.json(eqData).then(function(data) {
     console.log(data)
   // Creating a GeoJSON layer with retrieved data
   L.geoJSON(data, {
     // We turn each feature into a circleMarker on the map.
         pointToLayer: function(feature, latlng) {
-            console.log(data);
+            // console.log(data);
             return L.circleMarker(latlng);
         },
       // We set the style for each circleMarker using our styleInfo function.
@@ -204,31 +208,27 @@ d3.json(eqData).then(function(data) {
     earthquakes.addTo(myMap)
 });
 
-  // 3. Use d3.json to make a call to get our Tectonic Plate geoJSON data
 
-// Create a style for the lines.
-let lineStyle = {
-        color: "red",
-        weight: 1
-        };
-
+// TECTONIC PLATE GeoJSON
+// ----------------------
  let tekData = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json";
 
-// ** Grabbing our GeoJSON data
 d3.json(tekData).then(function(data) {
     console.log(data)
   // Creating a GeoJSON layer with retrieved data
   L.geoJson(data, {
-    style:lineStyle,
+    style:PlatelineStyle,
     onEachFeature: function(features, layer){
-      layer.bindPopup("<h3>hello</h3>")
+      layer.bindPopup("<h3>this is plate boundary line </h3>")
     }
   }).addTo(tectonicPlates);
     tectonicPlates.addTo(myMap)
 });
 
+// MAJOR EARTHQUAKE GeoJSON
+// ------------------------
 let majorEQData = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson"
-// ** Grabbing our GeoJSON data
+
 d3.json(majorEQData).then(function(data) {
     console.log(data)
   // Creating a GeoJSON layer with retrieved data
@@ -245,8 +245,8 @@ d3.json(majorEQData).then(function(data) {
         onEachFeature: function(feature, layer) {
             layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
   }
-
     }).addTo(majorEarthquakes);
 
     majorEarthquakes.addTo(myMap)
 });
+# comment change
